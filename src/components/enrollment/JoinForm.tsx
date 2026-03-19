@@ -11,6 +11,7 @@ interface JoinFormProps {
 
 export function JoinForm({ token }: JoinFormProps) {
   const [invitationId, setInvitationId] = useState<string | null>(null);
+  const [classInfo, setClassInfo] = useState<{ class_name: string | null; grade: number | null; school_name: string | null; homeroom_teacher: string | null }>({ class_name: null, grade: null, school_name: null, homeroom_teacher: null });
   const [isValidating, setIsValidating] = useState(true);
   const [tokenError, setTokenError] = useState("");
 
@@ -35,6 +36,12 @@ export function JoinForm({ token }: JoinFormProps) {
         }
         const data = await res.json();
         setInvitationId(data.invitation_id);
+        setClassInfo({
+          class_name: data.class_name,
+          grade: data.grade,
+          school_name: data.school_name,
+          homeroom_teacher: data.homeroom_teacher,
+        });
       } catch {
         setTokenError("שגיאת תקשורת.");
       } finally {
@@ -133,6 +140,23 @@ export function JoinForm({ token }: JoinFormProps) {
     <Card>
       <CardHeader>
         <CardTitle>טופס הרשמה</CardTitle>
+        {/* Class info */}
+        {(classInfo.class_name || classInfo.school_name) && (
+          <div className="mt-2 rounded-lg bg-blue-50 border border-blue-200 p-3 text-sm space-y-1">
+            {classInfo.school_name && (
+              <p className="font-medium text-blue-800">🏫 {classInfo.school_name}</p>
+            )}
+            {classInfo.class_name && (
+              <p className="text-blue-700">
+                📚 כיתה {classInfo.class_name}
+                {classInfo.grade ? ` (שכבה ${classInfo.grade})` : ""}
+              </p>
+            )}
+            {classInfo.homeroom_teacher && (
+              <p className="text-blue-600">👩‍🏫 מחנך/ת: {classInfo.homeroom_teacher}</p>
+            )}
+          </div>
+        )}
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Role */}

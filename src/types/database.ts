@@ -39,6 +39,7 @@ export interface User {
   phone: string | null;
   is_active: boolean;
   email_notifications: boolean;
+  is_homeroom_teacher: boolean; // true = מחנך, false = מורה מקצועי
   created_at: string;
 }
 

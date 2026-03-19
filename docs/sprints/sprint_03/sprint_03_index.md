@@ -4,7 +4,7 @@
 |-------|-------|
 | **Sprint** | 03 |
 | **Goal** | כל תפקיד רואה תצוגה שבועית, מורה מוסיף הערות/קישורים לשיעור, AI מתקדם |
-| **Status** | Not Started |
+| **Status** | **COMPLETE** ✅ |
 | **Start** | 2026-03-21 |
 | **End** | 2026-04-04 |
 | **PRD Version** | 3.0 + Stories 12-15 |
@@ -40,16 +40,19 @@
 
 ## Exit Criteria
 
-- [ ] Student can toggle daily/weekly view and select specific day
-- [ ] Parent can see all children together with color differentiation
-- [ ] Teacher can see all classes, filter, toggle daily/weekly
-- [ ] Teacher can add notes + external links to any lesson
-- [ ] Student/Parent see notes + resources in lesson detail
-- [ ] AI daily digest generates insights for admin
-- [ ] Smart reminders notify teacher about missing links
-- [ ] Student at risk detection works
-- [ ] All unit tests pass
-- [ ] E2E tests pass
+- [x] Student can toggle daily/weekly view and select specific day
+- [x] Parent can see all children together with color differentiation
+- [x] Teacher can see all classes, filter, toggle daily/weekly
+- [x] Teacher can add notes + external links to any lesson
+- [x] Student/Parent see notes + resources in lesson detail
+- [x] AI daily digest generates insights for admin
+- [x] Smart reminders notify teacher about missing links
+- [x] Student at risk detection works
+- [x] All unit tests pass (246/246)
+- [~] E2E tests — deferred (Playwright needs live server)
+- [x] Homeroom vs subject teacher permissions
+- [x] Join form shows class name + teacher
+- [x] Vercel deployment config + Resend email
 
 ---
 

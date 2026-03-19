@@ -325,3 +325,28 @@ C) Use a single `metadata` JSONB column for everything
 - New components: StudentWeekView, ParentWeekView, TeacherAllClassesView
 - Color palette needed for child/class differentiation (max 8 colors)
 - No new API endpoints needed — reuses `/api/schedule/week` and `/api/schedule/today`
+
+---
+
+## Decision 013: Homeroom Teacher vs Subject Teacher
+
+**Date:** 2026-03-20
+**Status:** Accepted
+**Context:** The system needs to distinguish between homeroom teachers (מחנכים) who manage a class and can approve enrollments, vs subject teachers (מורים מקצועיים) who teach specific subjects across multiple classes but cannot approve enrollment.
+
+**Options:**
+A) Add `is_homeroom_teacher` boolean to User table
+B) Add `homeroom_class_id` FK to User → Class
+C) Create a separate `teacher_role` ENUM (homeroom/subject/substitute)
+
+**Decision:** Option A — `is_homeroom_teacher` boolean on User table.
+
+**Rationale:** Simplest. Admin toggles it when creating/editing a teacher. The flag controls: (1) enrollment approval permissions, (2) ability to create templates for ANY teacher in their class. Subject teachers can only create templates with themselves as teacher_id.
+
+**Consequences:**
+- DB migration: `004_teacher_homeroom.sql` — ALTER TABLE "user" ADD COLUMN is_homeroom_teacher BOOLEAN DEFAULT false
+- API changes: POST `/api/schedule/templates` must allow both teacher types (not just admin)
+- API changes: enrollment approval must check `is_homeroom_teacher` OR `role=admin`
+- Frontend: join form shows class name + homeroom teacher name
+- Frontend: UsersManager gets homeroom toggle
+- FOUNDER approved 2026-03-20

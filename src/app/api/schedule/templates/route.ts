@@ -11,7 +11,8 @@ import type { LessonTemplate } from "@/types/database";
  */
 export async function POST(request: NextRequest) {
   const role = request.headers.get("x-user-role");
-  if (role !== "admin") {
+  const userId = request.headers.get("x-user-id");
+  if (role !== "admin" && role !== "teacher") {
     return NextResponse.json({ error: "אין הרשאה." }, { status: 403 });
   }
 
@@ -50,6 +51,29 @@ export async function POST(request: NextRequest) {
   }
 
   const supabase = createServerClient();
+
+  // Subject teacher can only create templates with self as teacher_id
+  if (role === "teacher" && userId) {
+    const { data: teacherUser } = await supabase
+      .from("user")
+      .select("is_homeroom_teacher")
+      .eq("id", userId)
+      .single();
+
+    const isHomeroom = (teacherUser as { is_homeroom_teacher: boolean } | null)?.is_homeroom_teacher;
+
+    // Subject teacher: auto-fill teacher_id to self, or reject if different
+    if (!isHomeroom) {
+      if (!body.teacher_id || body.teacher_id === "") {
+        body.teacher_id = userId; // Auto-fill for subject teacher
+      } else if (body.teacher_id !== userId) {
+        return NextResponse.json(
+          { error: "מורה מקצועי יכול להוסיף שיעורים רק עם עצמו כמורה." },
+          { status: 403 }
+        );
+      }
+    }
+  }
 
   // Create the template
   const { data: template, error: insertError } = await supabase

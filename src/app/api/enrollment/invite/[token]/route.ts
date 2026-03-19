@@ -47,12 +47,46 @@ export async function GET(
 
   const cls = classData as Class | null;
 
+  // Get school name
+  const { data: schoolData } = await supabase
+    .from("school")
+    .select("name")
+    .eq("id", inv.school_id)
+    .single();
+
+  // Get homeroom teacher name for this class
+  let homeroomTeacherName: string | null = null;
+  const { data: homeroomTeachers } = await supabase
+    .from("user")
+    .select("id, name")
+    .eq("role", "teacher")
+    .eq("is_homeroom_teacher", true)
+    .eq("school_id", inv.school_id);
+
+  // Find homeroom teacher who has templates for this class
+  if (homeroomTeachers && cls) {
+    const { data: classTemplates } = await supabase
+      .from("lesson_template")
+      .select("teacher_id")
+      .eq("class_id", inv.class_id);
+
+    const teacherIds = new Set(
+      ((classTemplates as { teacher_id: string }[]) || []).map((t) => t.teacher_id)
+    );
+    const homeroom = (homeroomTeachers as { id: string; name: string }[])
+      .find((t) => teacherIds.has(t.id));
+    homeroomTeacherName = homeroom?.name || null;
+  }
+
   return NextResponse.json({
     valid: true,
     invitation_id: inv.id,
     class_id: inv.class_id,
     school_id: inv.school_id,
+    class_name: cls?.name || null,
     grade: cls?.grade || null,
+    school_name: (schoolData as { name: string } | null)?.name || null,
+    homeroom_teacher: homeroomTeacherName,
   });
 }
 

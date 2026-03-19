@@ -25,7 +25,21 @@ export async function PUT(
   const role = request.headers.get("x-user-role");
   const userId = request.headers.get("x-user-id");
   const schoolId = request.headers.get("x-school-id");
-  if ((role !== "teacher" && role !== "admin") || !schoolId) {
+
+  // Only admin or homeroom teacher can approve/reject enrollment
+  if (role === "admin" && schoolId) {
+    // Admin — allowed
+  } else if (role === "teacher" && userId && schoolId) {
+    const supabaseCheck = createServerClient();
+    const { data: teacherData } = await supabaseCheck
+      .from("user")
+      .select("is_homeroom_teacher")
+      .eq("id", userId)
+      .single();
+    if (!(teacherData as { is_homeroom_teacher: boolean } | null)?.is_homeroom_teacher) {
+      return NextResponse.json({ error: "רק מחנך כיתה או מנהל יכולים לאשר הרשמות." }, { status: 403 });
+    }
+  } else {
     return NextResponse.json({ error: "אין הרשאה." }, { status: 403 });
   }
 

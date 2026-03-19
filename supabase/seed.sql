@@ -16,13 +16,16 @@
 INSERT INTO school (id, name) VALUES
   ('00000000-0000-0000-0000-000000000001', 'בית ספר דמו — SchoolHub');
 
--- 5 Teachers
-INSERT INTO "user" (id, school_id, name, role, pin, email) VALUES
-  ('10000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000001', 'גב׳ כהן', 'teacher', '$2b$12$nzwQj92aAxcA20bkO4SGsO2ZVK3Tcc2XnbfqdsxIU6q5/HBiUJPEq', 'cohen@demo.school'),
-  ('10000000-0000-0000-0000-000000000002', '00000000-0000-0000-0000-000000000001', 'מר לוי', 'teacher', '$2b$12$JdLHvmkQSoD04EA6iNvjd..oyV7ltc4wyuku6yJO0GuiKVQdbZ6kq', 'levi@demo.school'),
-  ('10000000-0000-0000-0000-000000000003', '00000000-0000-0000-0000-000000000001', 'גב׳ אברהם', 'teacher', '$2b$12$ijLoCED74UF5p391f/UFFuLVQepTyppYKbxSh2LAAPM46BD0KNw7G', 'avraham@demo.school'),
-  ('10000000-0000-0000-0000-000000000004', '00000000-0000-0000-0000-000000000001', 'מר דוד', 'teacher', '$2b$12$goZ8HLYuZ8YG1O897.LLreHOZjas1NkZexTn01oV/x9spsLzhrhh6', 'david@demo.school'),
-  ('10000000-0000-0000-0000-000000000005', '00000000-0000-0000-0000-000000000001', 'גב׳ רחל', 'teacher', '$2b$12$njMaN1SjvYR9..OW5FIEb.k7QMR8pdzxpT6Mw59jPYjt5OYLm.WIi', 'rachel@demo.school');
+-- 5 Teachers (3 homeroom + 2 subject)
+-- PIN: 111111, 222222, 333333, 444444, 555555
+-- גב׳ כהן = מחנכת ז'2, מר לוי = מחנך ד'1, גב׳ אברהם = מחנכת ב'3
+-- מר דוד + גב׳ רחל = מורים מקצועיים
+INSERT INTO "user" (id, school_id, name, role, pin, email, is_homeroom_teacher) VALUES
+  ('10000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000001', 'גב׳ כהן', 'teacher', '$2b$12$nzwQj92aAxcA20bkO4SGsO2ZVK3Tcc2XnbfqdsxIU6q5/HBiUJPEq', 'cohen@demo.school', true),
+  ('10000000-0000-0000-0000-000000000002', '00000000-0000-0000-0000-000000000001', 'מר לוי', 'teacher', '$2b$12$JdLHvmkQSoD04EA6iNvjd..oyV7ltc4wyuku6yJO0GuiKVQdbZ6kq', 'levi@demo.school', true),
+  ('10000000-0000-0000-0000-000000000003', '00000000-0000-0000-0000-000000000001', 'גב׳ אברהם', 'teacher', '$2b$12$ijLoCED74UF5p391f/UFFuLVQepTyppYKbxSh2LAAPM46BD0KNw7G', 'avraham@demo.school', true),
+  ('10000000-0000-0000-0000-000000000004', '00000000-0000-0000-0000-000000000001', 'מר דוד', 'teacher', '$2b$12$goZ8HLYuZ8YG1O897.LLreHOZjas1NkZexTn01oV/x9spsLzhrhh6', 'david@demo.school', false),
+  ('10000000-0000-0000-0000-000000000005', '00000000-0000-0000-0000-000000000001', 'גב׳ רחל', 'teacher', '$2b$12$njMaN1SjvYR9..OW5FIEb.k7QMR8pdzxpT6Mw59jPYjt5OYLm.WIi', 'rachel@demo.school', false);
 
 -- 1 Admin (PIN: 100100)
 INSERT INTO "user" (id, school_id, name, role, pin, email) VALUES

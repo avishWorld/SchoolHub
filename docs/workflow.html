@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SchoolHub — Project Workflow</title>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Syne:wght@400;700;800&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg:       #0a0c10;
+      --surface:  #111318;
+      --border:   #1e2229;
+      --accent:   #4f8cff;
+      --accent2:  #7ee8a2;
+      --accent3:  #f7c948;
+      --accent4:  #f76e6e;
+      --accent5:  #b47ff7;
+      --text:     #e4e8f0;
+      --muted:    #6b7480;
+      --founder:  #f7c948;
+      --cto:      #4f8cff;
+      --dev:      #7ee8a2;
+      --qa:       #b47ff7;
+      --doc:      #f7934c;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-size: 14px;
+      line-height: 1.6;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ---- GRID NOISE BG ---- */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(79,140,255,.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(79,140,255,.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ---- HEADER ---- */
+    header {
+      position: relative;
+      z-index: 10;
+      padding: 48px 60px 32px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .logo-area h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: 2.4rem;
+      font-weight: 800;
+      letter-spacing: -1px;
+      background: linear-gradient(120deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .logo-area p {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 4px;
+      font-family: 'IBM Plex Mono', monospace;
+    }
+
+    .header-meta {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 6px;
+    }
+
+    .sprint-badge {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 4px 12px;
+      border-radius: 4px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      color: var(--accent);
+    }
+
+    .date-badge {
+      font-size: 11px;
+      color: var(--muted);
+      font-family: 'IBM Plex Mono', monospace;
+    }
+
+    /* ---- LEGEND ---- */
+    .legend {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding: 16px 60px;
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+
+    .legend-label {
+      font-size: 11px;
+      color: var(--muted);
+      font-family: 'IBM Plex Mono', monospace;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-left: 8px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-family: 'IBM Plex Mono', monospace;
+    }
+
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    /* ---- MAIN LAYOUT ---- */
+    main {
+      position: relative;
+      z-index: 10;
+      padding: 48px 60px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    /* ---- PHASE SECTIONS ---- */
+    .phases {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .phase {
+      position: relative;
+    }
+
+    /* vertical connector */
+    .phase:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      right: 50%;
+      width: 2px;
+      height: 8px;
+      background: var(--border);
+      z-index: 1;
+    }
+
+    /* ---- ROW ---- */
+    .flow-row {
+      display: grid;
+      gap: 12px;
+      align-items: start;
+    }
+
+    .flow-row.cols-1 { grid-template-columns: 1fr; }
+    .flow-row.cols-2 { grid-template-columns: 1fr 1fr; }
+    .flow-row.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+    .flow-row.cols-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+
+    /* ---- NODE ---- */
+    .node {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px 20px;
+      position: relative;
+      transition: border-color .2s, box-shadow .2s;
+    }
+
+    .node:hover {
+      box-shadow: 0 0 0 1px var(--accent);
+      border-color: var(--accent);
+    }
+
+    .node-role {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .node-role .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .node-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      line-height: 1.3;
+    }
+
+    .node-desc {
+      font-size: 12.5px;
+      color: #9aa5b4;
+      line-height: 1.5;
+    }
+
+    .node-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-top: 10px;
+    }
+
+    .tag {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px;
+      padding: 2px 7px;
+      border-radius: 3px;
+      background: rgba(255,255,255,.04);
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+
+    /* role colors */
+    .role-founder .node-role { color: var(--founder); }
+    .role-founder { border-right: 3px solid var(--founder); }
+
+    .role-cto .node-role { color: var(--cto); }
+    .role-cto { border-right: 3px solid var(--cto); }
+
+    .role-dev .node-role { color: var(--dev); }
+    .role-dev { border-right: 3px solid var(--dev); }
+
+    .role-qa .node-role { color: var(--qa); }
+    .role-qa { border-right: 3px solid var(--qa); }
+
+    .role-doc .node-role { color: var(--doc); }
+    .role-doc { border-right: 3px solid var(--doc); }
+
+    /* ---- ARROW BLOCK ---- */
+    .arrow-block {
+      text-align: center;
+      padding: 8px 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+    }
+
+    .arrow-svg {
+      color: var(--muted);
+    }
+
+    .arrow-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: .5px;
+    }
+
+    /* ---- SECTION HEADER ---- */
+    .section-title {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-title::before {
+      content: '';
+      display: block;
+      height: 1px;
+      width: 24px;
+      background: var(--border);
+    }
+
+    /* ---- DECISION DIAMOND ---- */
+    .diamond-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+    }
+
+    .diamond {
+      width: 120px;
+      height: 60px;
+      background: var(--surface);
+      border: 1px solid var(--accent3);
+      transform: rotate(-45deg) skewX(15deg) skewY(15deg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 16px;
+    }
+
+    .diamond-inner {
+      transform: rotate(45deg) skewX(-15deg) skewY(-15deg);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--accent3);
+      text-align: center;
+      line-height: 1.3;
+    }
+
+    /* ---- DECISION NODE ---- */
+    .decision-node {
+      background: var(--surface);
+      border: 1px dashed var(--accent3);
+      border-radius: 8px;
+      padding: 14px 18px;
+      text-align: center;
+    }
+
+    .decision-node .decision-icon {
+      font-size: 20px;
+      margin-bottom: 6px;
+    }
+
+    .decision-node .decision-q {
+      font-family: 'Syne', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--accent3);
+      margin-bottom: 8px;
+    }
+
+    .decision-node .decision-paths {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      margin-top: 8px;
+    }
+
+    .path-yes { color: var(--accent2); font-size: 11px; font-family: 'IBM Plex Mono', monospace; }
+    .path-no  { color: var(--accent4); font-size: 11px; font-family: 'IBM Plex Mono', monospace; }
+
+    /* ---- FEEDBACK LOOP ---- */
+    .feedback-band {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px 24px;
+      background: rgba(79,140,255,.03);
+      margin-top: 32px;
+    }
+
+    .feedback-band h3 {
+      font-family: 'Syne', sans-serif;
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--accent);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .feedback-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+    }
+
+    .feedback-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 12px 16px;
+    }
+
+    .feedback-item .fi-from {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .feedback-item .fi-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .feedback-item .fi-desc {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    /* ---- DOCS TABLE ---- */
+    .docs-band {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px 24px;
+      background: rgba(247,147,76,.03);
+      margin-top: 16px;
+    }
+
+    .docs-band h3 {
+      font-family: 'Syne', sans-serif;
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--doc);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .docs-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    .doc-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 10px 14px;
+      transition: border-color .2s;
+    }
+
+    .doc-card:hover { border-color: var(--doc); }
+
+    .doc-card .dc-path {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9.5px;
+      color: var(--doc);
+      margin-bottom: 4px;
+      opacity: .8;
+    }
+
+    .doc-card .dc-name {
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 3px;
+    }
+
+    .doc-card .dc-desc {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    /* ---- DIVIDER ---- */
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 32px 0;
+      position: relative;
+    }
+
+    .divider-label {
+      position: absolute;
+      top: 50%;
+      right: 50%;
+      transform: translateY(-50%) translateX(50%);
+      background: var(--bg);
+      padding: 0 12px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    /* ---- RESPONSIVE ---- */
+    @media (max-width: 900px) {
+      header { padding: 28px 20px 20px; flex-direction: column; }
+      main   { padding: 28px 20px; }
+      .legend { padding: 12px 20px; }
+      .flow-row.cols-3, .flow-row.cols-4 { grid-template-columns: 1fr 1fr; }
+      .feedback-grid, .docs-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    /* ---- ANIMATIONS ---- */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .phase { animation: fadeUp .5s ease both; }
+    .phase:nth-child(1)  { animation-delay: .05s; }
+    .phase:nth-child(2)  { animation-delay: .12s; }
+    .phase:nth-child(3)  { animation-delay: .19s; }
+    .phase:nth-child(4)  { animation-delay: .26s; }
+    .phase:nth-child(5)  { animation-delay: .33s; }
+    .phase:nth-child(6)  { animation-delay: .40s; }
+    .phase:nth-child(7)  { animation-delay: .47s; }
+    .phase:nth-child(8)  { animation-delay: .54s; }
+    .phase:nth-child(9)  { animation-delay: .61s; }
+    .phase:nth-child(10) { animation-delay: .68s; }
+
+    /* ---- CONNECTOR LINE ---- */
+    .connector {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 4px 0;
+      gap: 1px;
+    }
+
+    .connector-line {
+      width: 2px;
+      background: var(--border);
+      flex: 1;
+      min-height: 20px;
+    }
+
+    .connector-arrow {
+      width: 0;
+      height: 0;
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-top: 7px solid var(--muted);
+    }
+
+    .connector-text {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px;
+      color: var(--muted);
+      background: var(--bg);
+      padding: 0 6px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo-area">
+    <h1>SchoolHub — Project Workflow</h1>
+    <p>// תהליך עבודה מלא · מ-FOUNDER עד DONE</p>
+  </div>
+  <div class="header-meta">
+    <span class="sprint-badge">Sprint 01 · Active</span>
+    <span class="date-badge">2026-03-18 · PRD v3.0</span>
+    <span class="date-badge">Next.js 14 + Supabase + Claude API</span>
+  </div>
+</header>
+
+<!-- LEGEND -->
+<div class="legend">
+  <span class="legend-label">Roles →</span>
+  <span class="legend-item"><span class="legend-dot" style="background:var(--founder)"></span>FOUNDER (Human)</span>
+  <span class="legend-item"><span class="legend-dot" style="background:var(--cto)"></span>[CTO]</span>
+  <span class="legend-item"><span class="legend-dot" style="background:var(--dev)"></span>[DEV]</span>
+  <span class="legend-item"><span class="legend-dot" style="background:var(--qa)"></span>[QA]</span>
+  <span class="legend-item"><span class="legend-dot" style="background:var(--doc)"></span>Documents</span>
+</div>
+
+<main>
+
+  <!-- ======================================= -->
+  <!--  PHASE 0 — TRIGGER                       -->
+  <!-- ======================================= -->
+  <div class="phases">
+
+    <div class="phase">
+      <div class="section-title">שלב 0 · נקודת ההתחלה</div>
+      <div class="flow-row cols-1">
+        <div class="node role-founder">
+          <div class="node-role"><span class="dot" style="background:var(--founder)"></span>FOUNDER — Human Operator</div>
+          <div class="node-title">הגדרת עדיפות ופיצ'ר חדש</div>
+          <div class="node-desc">FOUNDER בוחר מה עובדים עליו. יכול לבוא מה-PRD, מפידבק משתמשים, מבאג קריטי, או מהחלטה עסקית. <strong>FOUNDER תמיד מקבל ההחלטה הסופית.</strong></div>
+          <div class="node-tags">
+            <span class="tag">PRD.md</span>
+            <span class="tag">sprint_01_index.md</span>
+            <span class="tag">WhatsApp / שיחה</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ARROW -->
+    <div class="arrow-block">
+      <svg class="arrow-svg" width="12" height="28" viewBox="0 0 12 28" fill="none">
+        <line x1="6" y1="0" x2="6" y2="20" stroke="currentColor" stroke-width="2"/>
+        <path d="M2 18l4 8 4-8" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>
+      </svg>
+      <span class="arrow-label">sets priorities</span>
+    </div>
+
+    <!-- ======================================= -->
+    <!--  PHASE 1 — CTO PLANNING                 -->
+    <!-- ======================================= -->
+    <div class="phase">
+      <div class="section-title">שלב 1 · ארכיטקטורה ותכנון [CTO]</div>
+      <div class="flow-row cols-3">
+
+        <div class="node role-cto">
+          <div class="node-role"><span class="dot" style="background:var(--cto)"></span>[CTO] — Architecture</div>
+          <div class="node-title">עיצוב מבנה המערכת</div>
+          <div class="node-desc">מגדיר component diagram, data flow, module boundaries. קובע patterns. קורא ARCHITECTURE.md לפני כל שינוי.</div>
+          <div class="node-tags">
+            <span class="tag">ARCHITECTURE.md</span>
+            <span class="tag">module design</span>
+          </div>
+        </div>
+
+        <div class="node role-cto">
+          <div class="node-role"><span class="dot" style="background:var(--cto)"></span>[CTO] — Technical Decisions</div>
+          <div class="node-title">קבלת החלטות טכניות</div>
+          <div class="node-desc">כל החלטה תיעודית מסוג "reversible vs irreversible". החלטות בלתי הפיכות — FLAG לפאונדר. מתועד ב-DECISIONS.md.</div>
+          <div class="node-tags">
+            <span class="tag">DECISIONS.md</span>
+            <span class="tag">10 decisions logged</span>
+          </div>
+        </div>
+
+        <div class="node role-cto">
+          <div class="node-role"><span class="dot" style="background:var(--cto)"></span>[CTO] — Task Planning</div>
+          <div class="node-title">פירוק למשימות DEV</div>
+          <div class="node-desc">שובר features לתת-משימות. מגדיר quality gates, API contracts, tests needed, files affected, risks.</div>
+          <div class="node-tags">
+            <span class="tag">sprint_01_todo.md</span>
+            <span class="tag">task breakdown</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- CTO Decision gate -->
+    <div class="arrow-block">
+      <svg class="arrow-svg" width="12" height="28" viewBox="0 0 12 28" fill="none">
+        <line x1="6" y1="0" x2="6" y2="20" stroke="currentColor" stroke-width="2"/>
+        <path d="M2 18l4 8 4-8" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>
+      </svg>
+      <span class="arrow-label">decision gate</span>
+    </div>
+
+    <div class="phase">
+      <div class="flow-row cols-1">
+        <div class="node" style="border: 1px dashed var(--accent3); border-right: 3px solid var(--accent3);">
+          <div class="node-role"><span class="dot" style="background:var(--accent3)"></span>DECISION GATE — Reversible?</div>
+          <div class="node-title" style="color:var(--accent3)">⬡ האם ההחלטה הפיכה?</div>
+          <div class="node-desc">
+            <strong style="color:var(--accent2)">✓ כן — הפיכה:</strong> CTO מחליט וממשיך מיד. מתועד בקצרה.<br>
+            <strong style="color:var(--accent4)">✗ לא — בלתי הפיכה:</strong> FLAG לפאונדר עם options + tradeoffs. ממתין לאישור לפני המשך.
+          </div>
+          <div class="node-tags">
+            <span class="tag">e.g. Decision 001–010 — כולן תועדו ב-DECISIONS.md</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-block">
+      <svg class="arrow-svg" width="12" height="28" viewBox="0 0 12 28" fill="none">
+        <line x1="6" y1="0" x2="6" y2="20" stroke="currentColor" stroke-width="2"/>
+        <path d="M2 18l4 8 4-8" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>
+      </svg>
+      <span class="arrow-label">tasks handed to DEV</span>
+    </div>
+
+    <!-- ======================================= -->
+    <!--  PHASE 2 — DEV IMPLEMENTATION           -->
+    <!-- ======================================= -->
+    <div class="phase">
+      <div class="section-title">שלב 2 · פיתוח ויישום [DEV]</div>
+      <div class="flow-row cols-4">
+
+        <div class="node role-dev">
+          <div class="node-role"><span class="dot" style="background:var(--dev)"></span>[DEV] — Read First</div>
+          <div class="node-title">קריאת קוד קיים</div>
+          <div class="node-desc">לפני כתיבת שורה — קורא modules קיימים, ARCHITECTURE.md, _example/ folder. לא מנחש.</div>
+          <div class="node-tags">
+            <span class="tag">_example/</span>
+            <span class="tag">no guessing</span>
+          </div>
+        </div>
+
+        <div class="node role-dev">
+          <div class="node-role"><span class="dot" style="background:var(--dev)"></span>[DEV] — Implement</div>
+          <div class="node-title">כתיבת קוד נקי</div>
+          <div class="node-desc">מממש לפי הקוד הקיים. אין over-engineering. אין dependencies חדשות בלי אישור CTO.</div>
+          <div class="node-tags">
+            <span class="tag">backend/modules/</span>
+            <span class="tag">frontend/modules/</span>
+          </div>
+        </div>
+
+        <div class="node role-dev">
+          <div class="node-role"><span class="dot" style="background:var(--dev)"></span>[DEV] — Tests</div>
+          <div class="node-title">כתיבת בדיקות</div>
+          <div class="node-desc">כל פיצ'ר — לפחות unit test אחד. לא מסמן Done בלי tests. Vitest לunit, Playwright ל-E2E.</div>
+          <div class="node-tags">
+            <span class="tag">Vitest</span>
+            <span class="tag">Playwright</span>
+          </div>
+        </div>
+
+        <div class="node role-dev">
+          <div class="node-role"><span class="dot" style="background:var(--dev)"></span>[DEV] — Report</div>
+          <div class="node-title">דיווח ו-Blockers</div>
+          <div class="node-desc">מדווח: מה יושם, אילו files שונו, אילו tests נוספו, איך לאמת. מדגל blockers — לא מנחש.</div>
+          <div class="node-tags">
+            <span class="tag">structured output</span>
+            <span class="tag">blockers flagged</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="arrow-block">
+      <svg class="arrow-svg" width="12" height="28" viewBox="0 0 12 28" fill="none">
+        <line x1="6" y1="0" x2="6" y2="20" stroke="currentColor" stroke-width="2"/>
+        <path d="M2 18l4 8 4-8" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>
+      </svg>
+      <span class="arrow-label">submitted for review</span>
+    </div>
+
+    <!-- ======================================= -->
+    <!--  PHASE 3 — CTO REVIEW                   -->
+    <!-- ======================================= -->
+    <div class="phase">
+      <div class="section-title">שלב 3 · ביקורת קוד [CTO]</div>
+      <div class="flow-row cols-3">
+
+        <div class="node role-cto">
+          <div class="node-role"><span class="dot" style="background:var(--cto)"></span>[CTO] — Code Review</div>
+          <div class="node-title">Quality Gate Check</div>
+          <div class="node-desc">בודק: security, performance, maintainability, patterns. Tests נכתבו? Documentation?</div>
+          <div class="node-tags">
+            <span class="tag">quality gate</span>
+            <span class="tag">/project:cto</span>
+          </div>
+        </div>
+
+        <div class="node" style="border: 1px dashed var(--accent3); border-right: 3px solid var(--accent3);">
+          <div class="node-role"><span class="dot" style="background:var(--accent3)"></span>DECISION — Approved?</div>
+          <div class="node-title" style="color:var(--accent3)">⬡ הקוד עובר Review?</div>
+          <div class="node-desc">
+            <strong style="color:var(--accent2)">✓ כן:</strong> ממשיך ל-QA.<br>
+            <strong style="color:var(--accent4)">✗ לא:</strong> חוזר ל-DEV עם feedback מפורט. Cycle שוב.
+          </div>
+        </div>
+
+        <div class="node role-cto">
+          <div class="node-role"><span class="dot" style="background:var(--cto)"></span>[CTO] — Feedback Loop</div>
+          <div class="node-title">פידבק ל-DEV</div>
+          <div class="node-desc">כותב review עם files affected, risks, מה צריך לתקן. DEV מתקן ומגיש מחדש.</div>
+          <div class="node-tags">
+            <span class="tag">sprint_01_review.md</span>
+            <span class="tag">structured feedback</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="arrow-block">
+      <svg class="arrow-svg" width="12" height="28" viewBox="0 0 12 28" fill="none">
+        <line x1="6" y1="0" x2="6" y2="20" stroke="currentColor" stroke-width="2"/>
+        <path d="M2 18l4 8 4-8" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>
+      </svg>
+      <span class="arrow-label">forwarded to QA</span>
+    </div>
+
+    <!-- ======================================= -->
+    <!--  PHASE 4 — QA                           -->
+    <!-- ======================================= -->
+    <div class="phase">
+      <div class="section-title">שלב 4 · בדיקות איכות [QA]</div>
+      <div class="flow-row cols-3">
+
+        <div class="node role-qa">
+          <div class="node-role"><span class="dot" style="background:var(--qa)"></span>[QA] — Test Execution</div>
+          <div class="node-title">הרצת כל הבדיקות</div>
+          <div class="node-desc">Unit tests (Vitest), E2E (Playwright), Screenshots ל-GUI changes. Lighthouse ≥90 לנגישות.</div>
+          <div class="node-tags">
+            <span class="tag">npm run test</span>
+            <span class="tag">npx playwright test</span>
+            <span class="tag">Lighthouse ≥90</span>
+          </div>
+        </div>
+
+        <div class="node role-qa">
+          <div class="node-role"><span class="dot" style="background:var(--qa)"></span>[QA] — Bug Reports</div>
+          <div class="node-title">תיעוד באגים</div>
+          <div class="node-desc">כל באג — Bug Report מובנה: steps to reproduce, expected vs actual, Severity. Regression testing.</div>
+          <div class="node-tags">
+            <span class="tag">Critical/High/Medium/Low</span>
+            <span class="tag">edge cases</span>
+          </div>
+        </div>
+
+        <div class="node role-qa">
+          <div class="node-role"><span class="dot" style="background:var(--qa)"></span>[QA] — Sign-off</div>
+          <div class="node-title">אישור איכות</div>
+          <div class="node-desc">מאמת Happy path, Error cases, Edge cases, No regressions, Performance OK. רק אז Sign-off.</div>
+          <div class="node-tags">
+            <span class="tag">QA checklist</span>
+            <span class="tag">/project:qa</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="arrow-block">
+      <svg class="arrow-svg" width="12" height="28" viewBox="0 0 12 28" fill="none">
+        <line x1="6" y1="0" x2="6" y2="20" stroke="currentColor" stroke-width="2"/>
+        <path d="M2 18l4 8 4-8" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>
+      </svg>
+      <span class="arrow-label">DoD check</span>
+    </div>
+
+    <!-- ======================================= -->
+    <!--  PHASE 5 — DEFINITION OF DONE           -->
+    <!-- ======================================= -->
+    <div class="phase">
+      <div class="section-title">שלב 5 · Definition of Done</div>
+      <div class="flow-row cols-1">
+        <div class="node" style="border: 1px solid var(--accent2); border-right: 3px solid var(--accent2);">
+          <div class="node-role"><span class="dot" style="background:var(--accent2)"></span>DONE — 5 שערים חייבים לעבור</div>
+          <div class="node-title" style="color:var(--accent2)">Feature מוכרז "DONE" רק כאשר כל 5 תנאים מתקיימים</div>
+          <div class="node-desc" style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr 1fr; gap:12px; margin-top:10px;">
+            <div style="background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:10px; text-align:center;">
+              <div style="font-size:18px; margin-bottom:4px;">⚙️</div>
+              <div style="font-size:12px; font-weight:600; color:var(--text);">Code Works</div>
+              <div style="font-size:11px; color:var(--muted);">dev server ללא errors</div>
+            </div>
+            <div style="background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:10px; text-align:center;">
+              <div style="font-size:18px; margin-bottom:4px;">🧪</div>
+              <div style="font-size:12px; font-weight:600; color:var(--text);">Tests Pass</div>
+              <div style="font-size:11px; color:var(--muted);">unit + integration</div>
+            </div>
+            <div style="background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:10px; text-align:center;">
+              <div style="font-size:18px; margin-bottom:4px;">🎭</div>
+              <div style="font-size:12px; font-weight:600; color:var(--text);">E2E Pass</div>
+              <div style="font-size:11px; color:var(--muted);">Playwright flows</div>
+            </div>
+            <div style="background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:10px; text-align:center;">
+              <div style="font-size:18px; margin-bottom:4px;">🔒</div>
+              <div style="font-size:12px; font-weight:600; color:var(--text);">No Regressions</div>
+              <div style="font-size:11px; color:var(--muted);">existing features OK</div>
+            </div>
+            <div style="background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:10px; text-align:center;">
+              <div style="font-size:18px; margin-bottom:4px;">👁️</div>
+              <div style="font-size:12px; font-weight:600; color:var(--text);">Reviewed</div>
+              <div style="font-size:11px; color:var(--muted);">CTO + FOUNDER</div>
+            </div>
+          </div>
+          <div style="margin-top:10px; padding:8px 12px; background:rgba(246,70,70,.07); border:1px solid rgba(246,70,70,.2); border-radius:5px; font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--accent4);">
+            ⚠ NEVER mark done based on "it compiles" alone — sprint_01_index.md Exit Criteria
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-block">
+      <svg class="arrow-svg" width="12" height="28" viewBox="0 0 12 28" fill="none">
+        <line x1="6" y1="0" x2="6" y2="20" stroke="currentColor" stroke-width="2"/>
+        <path d="M2 18l4 8 4-8" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>
+      </svg>
+      <span class="arrow-label">sprint close</span>
+    </div>
+
+    <!-- ======================================= -->
+    <!--  PHASE 6 — SPRINT CLOSE                 -->
+    <!-- ======================================= -->
+    <div class="phase">
+      <div class="section-title">שלב 6 · סגירת ספרינט</div>
+      <div class="flow-row cols-3">
+
+        <div class="node role-cto">
+          <div class="node-role"><span class="dot" style="background:var(--cto)"></span>[CTO] — Sprint Report</div>
+          <div class="node-title">דו"ח ספרינט</div>
+          <div class="node-desc">מה הושלם, מה לא, מה עבר לספרינט הבא. Velocity, risks realized, lessons learned.</div>
+          <div class="node-tags">
+            <span class="tag">sprint_01_report.md</span>
+          </div>
+        </div>
+
+        <div class="node role-founder">
+          <div class="node-role"><span class="dot" style="background:var(--founder)"></span>FOUNDER — Sprint Review</div>
+          <div class="node-title">Retrospective + Next Sprint</div>
+          <div class="node-desc">FOUNDER בוחן תוצאות, מחליט priorities לספרינט הבא, מאשר או משנה כיוון.</div>
+          <div class="node-tags">
+            <span class="tag">sprint_01_review.md</span>
+            <span class="tag">next sprint planning</span>
+          </div>
+        </div>
+
+        <div class="node role-doc">
+          <div class="node-role"><span class="dot" style="background:var(--doc)"></span>Docs Update</div>
+          <div class="node-title">עדכון תיעוד</div>
+          <div class="node-desc">ARCHITECTURE.md, DECISIONS.md, PRD.md מתעדכנים לפי מה שנלמד. UI_KIT.md אם יש שינויי עיצוב.</div>
+          <div class="node-tags">
+            <span class="tag">living docs</span>
+            <span class="tag">updated each sprint</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div><!-- /phases -->
+
+  <!-- ======================================= -->
+  <!--  DIVIDER                                 -->
+  <!-- ======================================= -->
+  <div class="divider">
+    <span class="divider-label">Feedback Loops · מנגנוני היזון חוזר</span>
+  </div>
+
+  <!-- ======================================= -->
+  <!--  FEEDBACK LOOPS                          -->
+  <!-- ======================================= -->
+  <div class="feedback-band">
+    <h3>↺ Feedback Loops — מה חוזר לאן</h3>
+    <div class="feedback-grid">
+
+      <div class="feedback-item">
+        <div class="fi-from">QA → DEV</div>
+        <div class="fi-title">באג נמצא → תיקון</div>
+        <div class="fi-desc">QA מוצא באג, כותב Bug Report מובנה, DEV מתקן. חוזר ל-QA לאימות. ללא Sign-off אין DONE.</div>
+      </div>
+
+      <div class="feedback-item">
+        <div class="fi-from">CTO Review → DEV</div>
+        <div class="fi-title">Code Review → שיפור</div>
+        <div class="fi-desc">CTO מחזיר קוד עם feedback מפורט. DEV מתקן, מגיש מחדש. מחזור עד שהקוד עובר Review.</div>
+      </div>
+
+      <div class="feedback-item">
+        <div class="fi-from">DEV → CTO</div>
+        <div class="fi-title">Blocker → הכרעה</div>
+        <div class="fi-desc">DEV מוצא אי-בהירות בדרישות. מדגל מיד, לא מנחש. CTO או FOUNDER מבהירים, DEV ממשיך.</div>
+      </div>
+
+      <div class="feedback-item">
+        <div class="fi-from">CTO → FOUNDER</div>
+        <div class="fi-title">FLAG החלטה בלתי-הפיכה</div>
+        <div class="fi-desc">CTO מציג options + tradeoffs. FOUNDER בוחר. מתועד ב-DECISIONS.md עם date + rationale.</div>
+      </div>
+
+      <div class="feedback-item">
+        <div class="fi-from">Sprint Review → Sprint Planning</div>
+        <div class="fi-title">Retrospective Loop</div>
+        <div class="fi-desc">כל ספרינט מסתיים ב-review. מה עבד? מה לא? Velocity? Risks? הלמידה משפיעה על הספרינט הבא.</div>
+      </div>
+
+      <div class="feedback-item">
+        <div class="fi-from">Production → PRD</div>
+        <div class="fi-title">User Feedback → PRD Update</div>
+        <div class="fi-desc">פידבק מהורים/מורים/תלמידים משפיע על PRD. PRD.md הוא living document — מתעדכן כשמשהו משתנה.</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ======================================= -->
+  <!--  DOCUMENTS MAP                           -->
+  <!-- ======================================= -->
+  <div class="docs-band">
+    <h3>📄 מסמכי הפרויקט — Document Map</h3>
+    <div class="docs-grid">
+
+      <div class="doc-card">
+        <div class="dc-path">docs/PRD.md</div>
+        <div class="dc-name">Product Requirements</div>
+        <div class="dc-desc">מה המוצר עושה, User Stories, Acceptance Criteria. נכתב מראש, מתעדכן כשמשתנה.</div>
+      </div>
+
+      <div class="doc-card">
+        <div class="dc-path">CLAUDE.md</div>
+        <div class="dc-name">Project Context</div>
+        <div class="dc-desc">ה-single source of truth ל-Claude. Stack, commands, structure, domain context. נטען אוטומטית.</div>
+      </div>
+
+      <div class="doc-card">
+        <div class="dc-path">AGENTS.md</div>
+        <div class="dc-name">Role Definitions</div>
+        <div class="dc-desc">מגדיר CTO / DEV / QA / FOUNDER. אחריות, פורמט output, communication protocol.</div>
+      </div>
+
+      <div class="doc-card">
+        <div class="dc-path">docs/ARCHITECTURE.md</div>
+        <div class="dc-name">Technical Architecture</div>
+        <div class="dc-desc">Tech stack, system diagram, data model (11 tables), API endpoints, folder structure.</div>
+      </div>
+
+      <div class="doc-card">
+        <div class="dc-path">docs/DECISIONS.md</div>
+        <div class="dc-name">Decision Log</div>
+        <div class="dc-desc">10 decisions תועדו. כל החלטה: Context, Options, Decision, Rationale, Consequences.</div>
+      </div>
+
+      <div class="doc-card">
+        <div class="dc-path">docs/sprints/sprint_01/sprint_01_index.md</div>
+        <div class="dc-name">Sprint Index</div>
+        <div class="dc-desc">Goal, Scope (10 items), Exit Criteria (17 checkboxes), Risks, links to Todo/Report/Review.</div>
+      </div>
+
+      <div class="doc-card">
+        <div class="dc-path">docs/sprints/sprint_01/todo/</div>
+        <div class="dc-name">Sprint Todo</div>
+        <div class="dc-desc">רשימת משימות מפורטת לספרינט. מתעדכן בזמן אמת. פעיל בזמן הפיתוח.</div>
+      </div>
+
+      <div class="doc-card">
+        <div class="dc-path">docs/sprints/sprint_01/reports/ + reviews/</div>
+        <div class="dc-name">Sprint Report + Review</div>
+        <div class="dc-desc">נכתבים בסוף ספרינט. Report = CTO summary. Review = FOUNDER retrospective.</div>
+      </div>
+
+      <div class="doc-card">
+        <div class="dc-path">docs/ui/UI_KIT.md</div>
+        <div class="dc-name">UI Design System</div>
+        <div class="dc-desc">Design tokens, colors, typography, spacing, RTL guidelines. Tailwind + shadcn/ui.</div>
+      </div>
+
+      <div class="doc-card">
+        <div class="dc-path">.env.example → .env</div>
+        <div class="dc-name">Environment Config</div>
+        <div class="dc-desc">ANTHROPIC_API_KEY, SUPABASE_URL, ANON_KEY, SERVICE_ROLE_KEY. אף סוד לא ב-git.</div>
+      </div>
+
+      <div class="doc-card">
+        <div class="dc-path">backend/AGENTS.md + frontend/AGENTS.md</div>
+        <div class="dc-name">Domain Rules</div>
+        <div class="dc-desc">כללים ספציפיים לדומיין. קריאה לפני כתיבת קוד בכל domain.</div>
+      </div>
+
+      <div class="doc-card">
+        <div class="dc-path">tests/screenshots/</div>
+        <div class="dc-name">GUI Screenshots</div>
+        <div class="dc-desc">Playwright מצלם כל שינוי UI. חלק מ-Definition of Done לכל שינוי גרפי.</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ======================================= -->
+  <!--  SLASH COMMANDS QUICK REF               -->
+  <!-- ======================================= -->
+  <div class="divider">
+    <span class="divider-label">Slash Commands · פקודות מהירות</span>
+  </div>
+
+  <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; margin-top: 0;">
+
+    <div class="node role-cto" style="padding:12px 16px;">
+      <div class="node-role"><span class="dot" style="background:var(--cto)"></span>CTO Mode</div>
+      <div style="font-family:'IBM Plex Mono',monospace; font-size:15px; color:var(--accent); margin-bottom:4px;">/project:cto</div>
+      <div class="node-desc">ארכיטקטורה, החלטות, code review, quality gates</div>
+    </div>
+
+    <div class="node role-dev" style="padding:12px 16px;">
+      <div class="node-role"><span class="dot" style="background:var(--dev)"></span>DEV Mode</div>
+      <div style="font-family:'IBM Plex Mono',monospace; font-size:15px; color:var(--accent2); margin-bottom:4px;">/project:dev</div>
+      <div class="node-desc">פיתוח features, bug fixes, tests, integration</div>
+    </div>
+
+    <div class="node role-qa" style="padding:12px 16px;">
+      <div class="node-role"><span class="dot" style="background:var(--qa)"></span>QA Mode</div>
+      <div style="font-family:'IBM Plex Mono',monospace; font-size:15px; color:var(--qa); margin-bottom:4px;">/project:qa</div>
+      <div class="node-desc">testing, bug discovery, quality verification, sign-off</div>
+    </div>
+
+    <div class="node" style="padding:12px 16px; border-right:3px solid var(--accent3);">
+      <div class="node-role" style="color:var(--accent3);"><span class="dot" style="background:var(--accent3)"></span>Plan Mode</div>
+      <div style="font-family:'IBM Plex Mono',monospace; font-size:15px; color:var(--accent3); margin-bottom:4px;">/project:plan</div>
+      <div class="node-desc">כפה תכנון לפני עבודה מורכבת. CTO מציג plan לפאונדר.</div>
+    </div>
+
+    <div class="node" style="padding:12px 16px; border-right:3px solid var(--muted);">
+      <div class="node-role" style="color:var(--muted);"><span class="dot" style="background:var(--muted)"></span>Test Suite</div>
+      <div style="font-family:'IBM Plex Mono',monospace; font-size:15px; color:var(--text); margin-bottom:4px;">/project:test</div>
+      <div class="node-desc">הרץ את כל ה-unit tests — Vitest</div>
+    </div>
+
+    <div class="node" style="padding:12px 16px; border-right:3px solid var(--muted);">
+      <div class="node-role" style="color:var(--muted);"><span class="dot" style="background:var(--muted)"></span>E2E Suite</div>
+      <div style="font-family:'IBM Plex Mono',monospace; font-size:15px; color:var(--text); margin-bottom:4px;">/project:e2e</div>
+      <div class="node-desc">הרץ Playwright — browser flows, screenshots, accessibility</div>
+    </div>
+
+  </div>
+
+  <!-- footer -->
+  <div style="margin-top:48px; padding-top:24px; border-top:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
+    <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--muted);">SchoolHub · Sprint 01 · 2026-03-18</span>
+    <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--muted);">FOUNDER → [CTO] → [DEV] → [QA] → DONE</span>
+  </div>
+
+</main>
+</body>
+</html>

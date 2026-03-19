@@ -273,6 +273,34 @@ export function TeacherLessons() {
         >
           🤖 הדבק טקסט (AI)
         </Button>
+        <Button
+          variant="default"
+          size="sm"
+          onClick={() => {
+            // Create new template via API
+            const subject = prompt("שם מקצוע:");
+            const time = prompt("שעת התחלה (HH:MM):", "08:00");
+            const dayStr = prompt("יום בשבוע (0=ראשון, 1=שני, ...):", "0");
+            if (!subject || !time || !dayStr) return;
+            fetch("/api/schedule/templates", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                class_id: selectedClassId,
+                teacher_id: "", // Will be filled by middleware x-user-id for subject teachers
+                subject,
+                day_of_week: parseInt(dayStr),
+                start_time: time,
+                duration_minutes: 45,
+              }),
+            }).then((res) => {
+              if (res.ok) loadWeek();
+              else res.json().then((d) => setError(d.error || "שגיאה"));
+            });
+          }}
+        >
+          ➕ הוסף שיעור
+        </Button>
         </div>
       )}
 

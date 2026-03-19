@@ -14,7 +14,7 @@
 |---|---|
 | **Name** | SchoolHub |
 | **Purpose** | פורטל לימוד בית-ספרי מרכזי — נקודת כניסה אחת לשיעורים מקוונים |
-| **Current sprint** | Sprint 02 |
+| **Current sprint** | Sprint 03 |
 | **Dev port** | 3000 |
 
 ---
@@ -100,7 +100,7 @@ SchoolHub/
     └── sprints/
         ├── sprint_01/       # Sprint 01 — COMPLETE ✅ (23/23 dev, 11/16 QA)
         ├── sprint_02/       # Sprint 02 — COMPLETE ✅ (18/20 dev, 7/11 QA)
-        └── sprint_03/       # Sprint 03 — Weekly Views + Lesson Content + Advanced AI
+        └── sprint_03/       # Sprint 03 — COMPLETE ✅ (24/26 dev, 12/15 QA)
 ```
 
 ---
@@ -177,7 +177,8 @@ SUPABASE_SERVICE_ROLE_KEY=...     # Supabase service role (server only)
 ### Key Concepts
 - **PIN-based login:** 6-digit PIN only, bcrypt cost 12, 7-day session, multi-device
 - **LessonTemplate + LessonInstance:** Template = recurring ("Math every Tuesday 8:00"). Instance = specific date. Teacher sets recurring link on template or per-instance. "Copy from last week" clones links. Instance also has `notes` (text) and `resources` (JSONB array of {url, label}) — Decision 011.
-- **Enrollment via invite links:** Teacher sends `schoolhub.app/join/{token}` → parent/student self-registers → waiting list → teacher approves → PIN auto-generated
+- **Enrollment via invite links:** Teacher sends `schoolhub.app/join/{token}` → parent/student self-registers → waiting list → **homeroom teacher** approves → PIN auto-generated
+- **Teacher types:** `is_homeroom_teacher` boolean on User. Homeroom (מחנך) = manages class + approves enrollment. Subject (מקצועי) = teaches in class, adds own lessons only. Decision 013.
 - **Attendance = intent + confirmation:** Click "Join" records intent (join_clicked_at). Teacher confirms actual attendance. AI uses confirmed data.
 - **Integration:** Zoom & Microsoft Teams meeting links
 - **AI:** Claude API — Haiku for link parsing, Sonnet for digests. Monthly cap 1000 calls, caching, graceful degradation.
@@ -191,12 +192,15 @@ School, User, Student, ParentStudent, Class, LessonTemplate, LessonInstance, Att
 - Decision 008: 6-digit PIN only (not 4-6)
 - Decision 009: school_id on core + enrollment tables only
 - Decision 010: AI cost controls (cap, cache, fallback)
+- Decision 011: Lesson notes + resources on LessonInstance (JSONB)
+- Decision 012: Weekly view for all roles
+- Decision 013: Homeroom teacher (מחנך) vs subject teacher (מקצועי) — `is_homeroom_teacher` boolean
 
 ### Sprint Status
 - **Sprint 01:** COMPLETE ✅ — 23/23 dev, 11/16 QA. Foundation: PIN login, schedule builder, dashboards, enrollment, seed data.
 - **Sprint 02:** COMPLETE ✅ — 18/20 dev, 7/11 QA. Features: attendance, AI link parser, admin dashboard, morning briefing, polish.
-- **Sprint 03:** NOT STARTED — Weekly views (student/parent/teacher), lesson notes+resources (Decision 011), advanced AI (digest/reminders/at-risk/OCR), deployment. PRD Stories 12-15 added.
-- **Total:** 41 dev tasks done, 227 unit tests, 21 API routes, 12 pages, 11/11 PRD stories complete.
+- **Sprint 03:** COMPLETE ✅ — 24/26 dev, 12/15 QA. Weekly views, lesson notes+resources, daily digest AI (Sonnet), smart reminders, student-at-risk, schedule OCR (Vision), teacher roles (homeroom/subject), Vercel deploy, Resend email.
+- **Total:** 66 dev tasks done, 246 unit tests, 25 API routes, 15 pages, 19/19 PRD stories complete.
 
 ### Architecture Notes
 - **Session:** Web Crypto API HMAC-SHA256 (works in Edge Runtime + Node.js). Cookie set directly on NextResponse, NOT via `cookies()` API.

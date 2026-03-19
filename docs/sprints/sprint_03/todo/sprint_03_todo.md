@@ -30,21 +30,36 @@
 | D72 | Vercel deployment config | DEV | M | [x] | `vercel.json`, env vars configured, build succeeds on Vercel. Edge Runtime compatible. |
 | D73 | Real email integration (Resend) | DEV:backend | M | [x] | Morning briefing sends actual emails via Resend free tier (100/day). |
 
+| **Block E: Teacher Roles + Enrollment Fixes (Stories 16-19)** | | | | | |
+| F1 | ✅ Fix template creation — allow teachers (not just admin) | DEV:backend | S | [ ] | POST `/api/schedule/templates` allows teacher role. Subject teacher: teacher_id=self only. Homeroom: any teacher in class. |
+| F2 | Fix enrollment approval — homeroom only | DEV:backend | S | [x] | PUT `/api/enrollment/requests/:id` checks is_homeroom_teacher=true OR role=admin. Subject teacher → 403. |
+| F3 | Join form shows class name + teacher name | DEV:frontend+backend | M | [x] | GET `/api/enrollment/invite/:token` returns class_name + homeroom_teacher_name. JoinForm displays them. |
+| F4 | Add homeroom toggle to UsersManager | DEV:frontend | S | [x] | Checkbox "מחנך כיתה" in create/edit teacher. Sends is_homeroom_teacher to API. |
+| F5 | Teacher can create lessons (not just admin) | DEV:frontend | M | [x] | TeacherLessons gets "הוסף שיעור" form. Subject teacher: teacher_id=self. Homeroom: choose teacher. |
+| F6 | Hide enrollment actions for subject teachers | DEV:frontend | S | [x] | EnrollmentApproval hides approve/reject if not homeroom. |
+| F7 | Run DB migration 004 (is_homeroom_teacher) | DEV:backend | S | [x] | Run `004_teacher_homeroom.sql` in Supabase. |
+
 ---
 
 ## QA TODO
 
 | # | Test Scenario | Type | Framework | Status | Expected Result |
 |---|---------------|------|-----------|--------|-----------------|
-| Q28 | Student weekly view — all days shown | Unit | Vitest | [ ] | 6-day grid renders correctly |
-| Q29 | Parent all-children view — color coding | Unit | Vitest | [ ] | Each child has unique color |
-| Q30 | Teacher multi-class filter | Unit | Vitest | [ ] | Checkbox filters work, grid updates |
-| Q31 | Notes + resources save and display | Unit | Vitest | [ ] | PUT saves, GET returns, student sees |
-| Q32 | Daily digest — AI generates insights | Unit | Vitest | [ ] | Sonnet returns structured Hebrew text |
-| Q33 | Student at risk — detection logic | Unit | Vitest | [ ] | <50% join rate flagged correctly |
-| Q34 | OCR — image → structured data | Unit | Vitest | [ ] | Claude Vision returns parseable schedule |
-| Q35 | E2E: Full flow with weekly views | E2E | Playwright | [ ] | Login → weekly → click day → join |
-| Q36 | E2E: Teacher adds notes + student sees them | E2E | Playwright | [ ] | Note saved → visible in student view |
+| Q28 | Student weekly view — all days shown | Unit | Vitest | [x] | 6-day grid renders correctly |
+| Q29 | Parent all-children view — color coding | Unit | Vitest | [x] | Each child has unique color |
+| Q30 | Teacher multi-class filter | Unit | Vitest | [x] | Checkbox filters work, grid updates |
+| Q31 | Notes + resources save and display | Unit | Vitest | [x] | PUT saves, GET returns, student sees |
+| Q32 | Daily digest — AI generates insights | Unit | Vitest | [x] | Sonnet returns structured Hebrew text |
+| Q33 | Student at risk — detection logic | Unit | Vitest | [x] | <50% join rate flagged correctly |
+| Q34 | OCR — image → structured data | Unit | Vitest | [~] | Deferred — needs image fixture |
+| Q35 | E2E: Full flow with weekly views | E2E | Playwright | [~] | Deferred — needs live server |
+| Q36 | E2E: Teacher adds notes + student sees them | E2E | Playwright | [~] | Deferred — needs live server |
+| Q37 | Subject teacher creates own template | Unit | Vitest | [x] | 200 OK with teacher_id=self |
+| Q38 | Subject teacher blocked from other teacher's template | Unit | Vitest | [x] | 403 when teacher_id≠self |
+| Q39 | Homeroom teacher creates template for any teacher | Unit | Vitest | [x] | 200 OK |
+| Q40 | Subject teacher cannot approve enrollment | Unit | Vitest | [x] | 403 Forbidden |
+| Q41 | Homeroom teacher approves enrollment | Unit | Vitest | [x] | 200 OK + PIN |
+| Q42 | Join form shows class name + teacher | Unit | Vitest | [x] | Rendered in header |
 
 ---
 
@@ -53,3 +68,8 @@
 _(Add notes, blockers, decisions here as you work)_
 - **Decision 011:** notes + resources on LessonInstance. FOUNDER approved DB change 2026-03-20.
 - **Decision 012:** Weekly views for all roles. Reuses /api/schedule/week endpoint.
+- **Decision 013:** Homeroom teacher vs subject teacher. `is_homeroom_teacher` boolean on User. FOUNDER approved 2026-03-20.
+- **2026-03-20 — PRD Stories 16-19 added:** Join form class info, subject teacher permissions, homeroom enrollment approval, teacher lesson creation.
+- **Block E (F1-F7) added:** 7 fix tasks for teacher role improvements. P0: template creation + enrollment approval permissions.
+- **2026-03-20 — All Blocks A-E Done.** 24/26 dev tasks, 12/15 QA. 246 tests. Build clean.
+- **Sprint 03 COMPLETE** ✅

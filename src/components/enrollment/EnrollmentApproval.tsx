@@ -28,6 +28,21 @@ export function EnrollmentApproval() {
   const [shownPin, setShownPin] = useState<{ name: string; pin: string } | null>(null);
   const [rejectId, setRejectId] = useState<string | null>(null);
   const [rejectReason, setRejectReason] = useState("");
+  const [canApprove, setCanApprove] = useState(true);
+
+  // Check if user is homeroom teacher or admin
+  useEffect(() => {
+    async function checkPermission() {
+      try {
+        // If the enrollment API returns 403, user can't approve
+        const res = await fetch("/api/enrollment/requests");
+        if (res.status === 403) {
+          setCanApprove(false);
+        }
+      } catch { /* default to true */ }
+    }
+    checkPermission();
+  }, []);
 
   const loadRequests = useCallback(async () => {
     try {
@@ -152,23 +167,27 @@ export function EnrollmentApproval() {
                       {new Date(req.created_at).toLocaleDateString("he-IL")}
                     </p>
                   </div>
-                  <div className="flex gap-2 shrink-0">
-                    <Button
-                      size="sm"
-                      onClick={() => handleApprove(req.id, req.name)}
-                      disabled={processingId === req.id}
-                    >
-                      {processingId === req.id ? "מאשר..." : "✅ אשר"}
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => setRejectId(rejectId === req.id ? null : req.id)}
-                      disabled={processingId === req.id}
-                    >
-                      ❌ דחה
-                    </Button>
-                  </div>
+                  {canApprove ? (
+                    <div className="flex gap-2 shrink-0">
+                      <Button
+                        size="sm"
+                        onClick={() => handleApprove(req.id, req.name)}
+                        disabled={processingId === req.id}
+                      >
+                        {processingId === req.id ? "מאשר..." : "✅ אשר"}
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => setRejectId(rejectId === req.id ? null : req.id)}
+                        disabled={processingId === req.id}
+                      >
+                        ❌ דחה
+                      </Button>
+                    </div>
+                  ) : (
+                    <span className="text-xs text-gray-400">ממתין לאישור מחנך</span>
+                  )}
                 </div>
 
                 {/* Reject reason input */}

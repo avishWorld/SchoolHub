@@ -38,6 +38,7 @@ export function UsersManager() {
   const [showCreate, setShowCreate] = useState(false);
   const [formName, setFormName] = useState("");
   const [formRole, setFormRole] = useState("student");
+  const [formIsHomeroom, setFormIsHomeroom] = useState(false);
   const [formEmail, setFormEmail] = useState("");
   const [formPhone, setFormPhone] = useState("");
   const [formClassId, setFormClassId] = useState("");
@@ -89,6 +90,7 @@ export function UsersManager() {
           email: formEmail || undefined,
           phone: formPhone || undefined,
           class_id: formRole === "student" ? formClassId : undefined,
+          is_homeroom_teacher: formRole === "teacher" ? formIsHomeroom : undefined,
         }),
       });
       if (!res.ok) {
@@ -273,6 +275,16 @@ ${rows}
                 </select>
               </div>
             </div>
+            {formRole === "teacher" && (
+              <label className="flex items-center gap-2 text-sm text-gray-700">
+                <input
+                  type="checkbox"
+                  checked={formIsHomeroom}
+                  onChange={(e) => setFormIsHomeroom(e.target.checked)}
+                />
+                מחנך/ת כיתה (יכול/ה לאשר הרשמות)
+              </label>
+            )}
             {formRole === "student" && (
               <div className="space-y-1">
                 <label htmlFor="user-class" className="text-sm font-medium text-gray-700">כיתה</label>

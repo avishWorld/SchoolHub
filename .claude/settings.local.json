@@ -20,7 +20,16 @@
       "Bash(git checkout *)",
       "Bash(git merge *)",
       "Bash(ls *)",
-      "Bash(pwd)"
+      "Bash(pwd)",
+      "Bash(node -e \":*)",
+      "Bash(grep -c \"\"\"version\"\": \"\"\"\"\" package-lock.json)",
+      "Bash(npm install)",
+      "Bash(mkdir -p C:/Users/AvishaiOz/Desktop/LOCAL/SchoolHub/src/app/api/enrollment/invite/\"[token]\")",
+      "Bash(mkdir -p \"C:/Users/AvishaiOz/Desktop/LOCAL/SchoolHub/src/app/api/enrollment/requests/[id]\")",
+      "Bash(mkdir -p \"C:/Users/AvishaiOz/Desktop/LOCAL/SchoolHub/src/app/join/[token]\")",
+      "Bash(mkdir -p \"C:/Users/AvishaiOz/Desktop/LOCAL/SchoolHub/src/app/api/attendance/[instanceId]\")",
+      "Bash(mkdir -p \"C:/Users/AvishaiOz/Desktop/LOCAL/SchoolHub/src/app/api/attendance/[instanceId]/confirm\")",
+      "Bash(git config --global --add safe.directory C:/Users/AvishaiOz/Desktop/LOCAL/SchoolHub)"
     ],
     "deny": [
       "Bash(git push --force *)",
