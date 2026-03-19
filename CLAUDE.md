@@ -1,7 +1,7 @@
-# {{PROJECT_NAME}} — Claude Code Project Context
+# SchoolHub — Claude Code Project Context
 
-> **Stack:** {{TECH_STACK}}
-> **Purpose:** {{PROJECT_DESCRIPTION}}
+> **Stack:** Next.js 14 + TypeScript + Tailwind CSS + Supabase + Claude API
+> **Purpose:** פורטל לימוד בית-ספרי מרכזי — נקודת כניסה אחת לשיעורים מקוונים עבור תלמידים, מורים, הורים ומנהלים.
 >
 > This file is auto-loaded by Claude Code CLI when you open this project directory.
 > It is the single source of truth for Claude's project awareness.
@@ -12,21 +12,21 @@
 
 | Field | Value |
 |---|---|
-| **Name** | {{PROJECT_NAME}} |
-| **Purpose** | {{PROJECT_DESCRIPTION}} |
-| **Current sprint** | Sprint 01 |
-| **Dev port** | {{DEV_PORT}} |
+| **Name** | SchoolHub |
+| **Purpose** | פורטל לימוד בית-ספרי מרכזי — נקודת כניסה אחת לשיעורים מקוונים |
+| **Current sprint** | Sprint 02 |
+| **Dev port** | 3000 |
 
 ---
 
 ## 2. Key Commands
 
 ```bash
-# Development — replace with your actual commands
-{{DEV_COMMAND}}                    # Start dev server
-{{BUILD_COMMAND}}                  # Production build
-{{TEST_COMMAND}}                   # Run unit tests
-{{LINT_COMMAND}}                   # Lint / type check
+# Development
+npm run dev                        # Start dev server
+npm run build                      # Production build
+npm run test                       # Run unit tests
+npm run lint                       # Lint / type check
 
 # E2E Testing (Playwright)
 npx playwright test                # Run all E2E tests
@@ -43,11 +43,13 @@ npx playwright test --debug        # Debug mode
 ```
 A FEATURE IS "DONE" ONLY WHEN:
   1. Code works — dev server runs without errors
-  2. Tests pass — unit tests cover the new logic
+  2. Unit tests pass — ≥80% coverage for business logic, ≥60% for infrastructure
   3. E2E pass — browser tests on affected flows (if UI changed)
-  4. No regressions — existing features still work
-  5. Reviewed — teammate or CTO has seen the code
-  6. Screenshots — captured for GUI changes (tests/screenshots/)
+  4. No regressions — existing tests still pass
+  5. Accessibility — Lighthouse score ≥ 90 (if UI changed)
+  6. Reviewed — CTO has reviewed using Good/Bad/Ugly protocol
+  7. Screenshots — captured for GUI changes (tests/screenshots/)
+  8. Docs updated — ARCHITECTURE.md / DECISIONS.md if design changed
 ```
 
 **NEVER mark done based on "it compiles" alone.**
@@ -57,7 +59,7 @@ A FEATURE IS "DONE" ONLY WHEN:
 ## 4. Project Structure
 
 ```
-{{PROJECT_NAME}}/
+SchoolHub/
 ├── CLAUDE.md                # This file — project context for Claude
 ├── AGENTS.md                # Role definitions (CTO, DEV, QA)
 ├── README.md                # Project README
@@ -96,7 +98,9 @@ A FEATURE IS "DONE" ONLY WHEN:
     ├── ui/
     │   └── UI_KIT.md        # Design system tokens
     └── sprints/
-        └── sprint_01/       # Sprint artifacts (index, todo, reports)
+        ├── sprint_01/       # Sprint 01 — COMPLETE ✅ (23/23 dev, 11/16 QA)
+        ├── sprint_02/       # Sprint 02 — COMPLETE ✅ (18/20 dev, 7/11 QA)
+        └── sprint_03/       # Sprint 03 — Weekly Views + Lesson Content + Advanced AI
 ```
 
 ---
@@ -107,6 +111,9 @@ Copy `.env.example` → `.env`. Required:
 
 ```
 ANTHROPIC_API_KEY=sk-ant-...      # Claude API key
+NEXT_PUBLIC_SUPABASE_URL=...      # Supabase project URL
+NEXT_PUBLIC_SUPABASE_ANON_KEY=... # Supabase anon key
+SUPABASE_SERVICE_ROLE_KEY=...     # Supabase service role (server only)
 ```
 
 ---
@@ -143,8 +150,8 @@ ANTHROPIC_API_KEY=sk-ant-...      # Claude API key
 
 | Level | Location | Tool | When |
 |-------|----------|------|------|
-| **Unit** | `*/modules/*/tests/unit/` | Jest / pytest / vitest | Every feature |
-| **Integration** | `*/modules/*/tests/integration/` | Framework test runner | Cross-module features |
+| **Unit** | `*/modules/*/tests/unit/` | Vitest | Every feature |
+| **Integration** | `*/modules/*/tests/integration/` | Vitest | Cross-module features |
 | **E2E** | `tests/e2e/` | Playwright | Every UI change |
 | **Screenshots** | `tests/screenshots/` | Playwright | Every UI change |
 
@@ -158,3 +165,43 @@ ANTHROPIC_API_KEY=sk-ant-...      # Claude API key
 - Do NOT skip writing tests for new logic
 - Do NOT hardcode secrets or credentials
 - Do NOT import directly across modules — use shared interfaces
+
+---
+
+## 10. Domain Context
+
+**Language:** Hebrew (RTL) primary, English secondary
+**Users:** Students, Parents, Teachers, School Admins
+**PRD Version:** 3.0 (see `docs/PRD.md`)
+
+### Key Concepts
+- **PIN-based login:** 6-digit PIN only, bcrypt cost 12, 7-day session, multi-device
+- **LessonTemplate + LessonInstance:** Template = recurring ("Math every Tuesday 8:00"). Instance = specific date. Teacher sets recurring link on template or per-instance. "Copy from last week" clones links. Instance also has `notes` (text) and `resources` (JSONB array of {url, label}) — Decision 011.
+- **Enrollment via invite links:** Teacher sends `schoolhub.app/join/{token}` → parent/student self-registers → waiting list → teacher approves → PIN auto-generated
+- **Attendance = intent + confirmation:** Click "Join" records intent (join_clicked_at). Teacher confirms actual attendance. AI uses confirmed data.
+- **Integration:** Zoom & Microsoft Teams meeting links
+- **AI:** Claude API — Haiku for link parsing, Sonnet for digests. Monthly cap 1000 calls, caching, graceful degradation.
+
+### Data Model (11 tables)
+School, User, Student, ParentStudent, Class, LessonTemplate, LessonInstance, Attendance, Invitation, EnrollmentRequest, AdminAuditLog
+
+### Key Decisions (see `docs/DECISIONS.md`)
+- Decision 006: Two-table lesson model (template + instance)
+- Decision 007: Attendance = intent + confirmation
+- Decision 008: 6-digit PIN only (not 4-6)
+- Decision 009: school_id on core + enrollment tables only
+- Decision 010: AI cost controls (cap, cache, fallback)
+
+### Sprint Status
+- **Sprint 01:** COMPLETE ✅ — 23/23 dev, 11/16 QA. Foundation: PIN login, schedule builder, dashboards, enrollment, seed data.
+- **Sprint 02:** COMPLETE ✅ — 18/20 dev, 7/11 QA. Features: attendance, AI link parser, admin dashboard, morning briefing, polish.
+- **Sprint 03:** NOT STARTED — Weekly views (student/parent/teacher), lesson notes+resources (Decision 011), advanced AI (digest/reminders/at-risk/OCR), deployment. PRD Stories 12-15 added.
+- **Total:** 41 dev tasks done, 227 unit tests, 21 API routes, 12 pages, 11/11 PRD stories complete.
+
+### Architecture Notes
+- **Session:** Web Crypto API HMAC-SHA256 (works in Edge Runtime + Node.js). Cookie set directly on NextResponse, NOT via `cookies()` API.
+- **Hebrew in headers:** Use `encodeURIComponent()` for HTTP header values, `toBase64()`/`fromBase64()` for cookie payloads.
+- **Supabase types:** Use `as never` casts for insert/update until real generated types are connected.
+- **RTL inputs:** Use `data-pin-digit` attribute to exclude specific inputs from global `text-align: right` override.
+- **Claude AI:** Use Haiku for link parsing (fast+cheap), Sonnet for insights. Cache responses, 1000 calls/month cap.
+- **Font:** `next/font/google` Rubik with `--font-rubik` CSS variable (no @import, no FOUT).

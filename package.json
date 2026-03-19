@@ -1,0 +1,53 @@
+{
+  "name": "schoolhub",
+  "version": "1.0.0",
+  "private": true,
+  "description": "פורטל לימוד בית-ספרי מרכזי — נקודת כניסה אחת לשיעורים מקוונים",
+  "scripts": {
+    "dev": "next dev --port 3000",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "dashboard": "node tools/generate-dashboard.mjs .",
+    "dashboard:watch": "node -e \"const{watch}=require('fs');const{execSync}=require('child_process');watch('docs/sprints',{recursive:true},()=>{execSync('node tools/generate-dashboard.mjs .',{stdio:'inherit'})});console.log('Watching docs/sprints for changes...')\""
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.80.0",
+    "@supabase/supabase-js": "^2.49.0",
+    "bcryptjs": "^2.4.3",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.0",
+    "lucide-react": "^0.383.0",
+    "next": "14.2.35",
+    "react": "^18",
+    "react-dom": "^18",
+    "resend": "^6.9.4",
+    "tailwind-merge": "^2.2.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.58.2",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "@vitejs/plugin-react": "^4.0.0",
+    "eslint": "^8",
+    "eslint-config-next": "14.2.35",
+    "jsdom": "^26.1.0",
+    "postcss": "^8",
+    "tailwindcss": "^3.4.1",
+    "tailwindcss-animate": "^1.0.7",
+    "typescript": "^5",
+    "vitest": "^3.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/avishWorld/SchoolHub.git"
+  }
+}
